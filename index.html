@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4a0b5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Kinlove Inventory">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" href="icons/icon-192.png">
+<title>Kinlove Inventory</title>
+<style>
+:root{--pink:#f4a0b5;--pink2:#f8d4df;--yellow:#ffe7a6;--yellow2:#fff5d5;--ink:#51424a;--muted:#8d7b84;--paper:#fffaf4;--line:#efdce0;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#fffaf5,#fff6ee);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+button,input,textarea{font:inherit}.app{max-width:900px;margin:auto;padding:18px 14px 40px}
+header{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:28px;padding:18px 18px 16px;box-shadow:0 10px 30px #d99aaa22;position:sticky;top:10px;z-index:5;backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:14px}.brand img{width:72px;height:72px;border-radius:20px;object-fit:cover}.brand h1{font-size:26px;margin:0 0 4px}.brand p{margin:0;color:var(--muted);font-size:14px}
+.top{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:16px;padding:12px 15px;font-weight:750;color:var(--ink);cursor:pointer}.yellow{background:var(--yellow)}.pink{background:var(--pink2)}.dark{background:var(--ink);color:white}.outline{background:white;border:1px solid var(--line)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}.tab{padding:15px;border-radius:18px;border:2px solid transparent;background:white;font-weight:800;color:var(--muted);cursor:pointer}.tab.active{background:linear-gradient(135deg,var(--yellow),var(--pink2));border-color:#f3cbd5;color:var(--ink)}
+.status{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:12px 15px;margin-bottom:15px}.locked{color:#b85d75;font-weight:800}.unlocked{color:#6c855f;font-weight:800}
+.section{background:#fff;border:1px solid var(--line);border-radius:22px;margin:13px 0;overflow:hidden}.section h2{font-size:18px;margin:0;padding:15px 17px;background:linear-gradient(90deg,#fff3d2,#fde2e9);display:flex;justify-content:space-between}.rows{padding:0 14px}.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:13px 3px;border-bottom:1px solid #f2e5e6}.row:last-child{border-bottom:0}.name{font-weight:700}.stamp{font-size:11px;color:var(--muted);margin-top:4px}.controls{display:flex;align-items:center;gap:6px}.qty{min-width:54px;text-align:center;font-weight:850;font-size:18px;background:var(--yellow2);padding:9px 8px;border-radius:12px}.mini{width:40px;height:40px;border:0;border-radius:12px;font-size:22px;font-weight:900;cursor:pointer}.minus{background:#f8d6df}.plus{background:var(--pink);color:white}.trash{background:#fff;border:1px solid #eccfd5;color:#b55d70;font-size:16px}.note{grid-column:1/-1;width:100%;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fffafc;resize:vertical;min-height:48px}.note:disabled{opacity:.65}.addline{padding:13px 14px;border-top:1px dashed var(--line);display:flex;gap:8px}.addline input{flex:1;border:1px solid var(--line);border-radius:12px;padding:11px}.empty{padding:18px;color:var(--muted);font-style:italic}
+.modal{position:fixed;inset:0;background:#33262b88;display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.show{display:flex}.card{width:min(420px,100%);background:var(--paper);border-radius:24px;padding:22px;box-shadow:0 20px 60px #0003}.card h3{margin-top:0}.card input{width:100%;padding:13px;border:1px solid var(--line);border-radius:14px;margin:8px 0 12px}.modal-actions{display:flex;gap:8px;justify-content:flex-end}.small{font-size:12px;color:var(--muted);line-height:1.5}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:white;padding:11px 16px;border-radius:999px;transition:.25s;z-index:30}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:620px){.app{padding:10px}.brand img{width:60px;height:60px}.brand h1{font-size:22px}.row{grid-template-columns:1fr}.controls{justify-content:flex-end}.status{align-items:flex-start;gap:8px;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">
+    <img src="icons/icon-192.png" alt="KinLove Inventory logo">
+    <div><h1>Kinlove Inventory</h1><p>Flowers + Coffee • Inventory</p></div>
+  </div>
+  <div class="top">
+    <button class="btn yellow" id="lockBtn">🔒 Lock</button>
+    <button class="btn pink" id="addBtn">＋ Add item</button>
+    <button class="btn outline" id="resetBtn">↻ Reset quantities</button>
+    <button class="btn outline" id="undoBtn">↩ Undo</button>
+    <button class="btn outline" id="passBtn">🔑 Password</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-inv="FOH Inventory">📠 FOH Inventory</button>
+  <button class="tab" data-inv="Kitchen Inventory">🍳 Kitchen Inventory</button>
+</div>
+
+<div class="status"><div id="statusText" class="locked">🔒 Locked</div><div id="lastText">No updates yet</div></div>
+<main id="inventory"></main>
+</div>
+
+<div class="modal" id="modal">
+ <div class="card">
+   <h3 id="modalTitle">Unlock inventory</h3>
+   <div id="modalBody"></div>
+   <div class="modal-actions">
+     <button class="btn outline" id="cancelModal">Cancel</button>
+     <button class="btn dark" id="confirmModal">Continue</button>
+   </div>
+ </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DEFAULT_ITEMS={"FOH Inventory": {"Drinks": ["Schweppes", "Brr", "Mountain dew", "Coke zero", "Sprite", "500ml water", "Pocari 500ml", "Welch grape", "Welch orange", "Arizona lemon", "Arizona peach"], "Cups & Packaging": ["16oz cups", "22 oz cups", "12oz papercups", "Brown kraft", "White kraft"], "Tiramisu Cakes": ["Classic Tiramisu cake", "Matcha Tiramisu cake", "Biscoff Tiramisu cake"], "Bouquets": ["350 dried flowers", "500 dried flowers", "2000 peonies", "1000 singlerose", "1,500 preserved", "2,500 preserved", "3,500 preserved", "1000/pax Pampass"], "Flowers + Coffee": ["Flowers + coffee (799)"], "Ice Cream": [], "Condiments": ["Sugar/pouch", "Brown sugar in grams", "White sugar in grams", "Darkchoco powder in grams", "Matcha powder in grams", "Uji powder in grams", "Hojicha powder in grams", "Barley powder in grams", "Blueberry Jam", "Strawberry Jam", "Mango Syrup", "Blueberry Syrup", "Mixedberry Syrup", "Lemon Syrup", "Calamansi Syrup", "Frappe Syrup", "Caramel Syrup", "Choco drizzle", "Caramel drizzle"]}, "Kitchen Inventory": {"Snacks": ["Churros", "Popcorn original", "Ramen mild", "Ramen spicy", "Fries/pax", "Pizza hawaiian", "Pizza No meat"], "Per piece": ["Egg", "Cheese (square)", "Ham", "Slice Bread"], "Meals": ["Bacon/pax", "Can Cornbeef", "Can CornTuna", "Chicken Fillet", "Lumpia/2", "Chicken/pax", "Pancake/pax"], "Packaging": ["Take out Box for pancake", "Take out Sauce cup"], "Condiments": ["Pineapple /set", "Rice / serving", "Ice / pax", "Chocolate dip in grams", "Mayo in grams", "BBQ sauce in grams", "Maggi Savor", "White Sugar in grams", "Brown Sugar in grams", "Oil in grams", "Salt in grams", "Cinnamon in grams"]}};
+const STORAGE="kinlove-inventory-v1";
+const APP="Kinlove Inventory";
+let state=JSON.parse(localStorage.getItem(STORAGE)||"null");
+let current="FOH Inventory", unlocked=false, undoStack=[];
+
+function deepClone(x){return JSON.parse(JSON.stringify(x))}
+function now(){return new Date().toLocaleString([], {year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})}
+function save(){localStorage.setItem(STORAGE,JSON.stringify(state))}
+function toast(s){let t=document.getElementById("toast");t.textContent=s;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+function init(){
+ if(!state){state={password:null,lastUpdate:null,items:{}};for(const inv in DEFAULT_ITEMS){state.items[inv]={};for(const cat in DEFAULT_ITEMS[inv]){state.items[inv][cat]=DEFAULT_ITEMS[inv][cat].map(name=>({name,qty:0,note:"",updated:null}))}}save()}
+ render(); updateStatus();
+}
+function updateStatus(){document.getElementById("statusText").textContent=unlocked?"🔓 Unlocked — editing enabled":"🔒 Locked — inventory protected";document.getElementById("statusText").className=unlocked?"unlocked":"locked";document.getElementById("lockBtn").textContent=unlocked?"🔒 Save & Lock":"🔓 Unlock";document.getElementById("lastText").textContent=state.lastUpdate?`Last update: ${state.lastUpdate}`:"No updates yet"}
+function snapshot(){undoStack.push(deepClone(state));if(undoStack.length>20)undoStack.shift()}
+function changed(){state.lastUpdate=now();save();updateStatus();render()}
+function render(){
+ const root=document.getElementById("inventory");root.innerHTML="";
+ for(const [cat,arr] of Object.entries(state.items[current])){
+  const sec=document.createElement("section");sec.className="section";
+  const h=document.createElement("h2");h.innerHTML=`<span>${cat}</span><span>${arr.length} items</span>`;sec.appendChild(h);
+  const rows=document.createElement("div");rows.className="rows";
+  if(!arr.length)rows.innerHTML='<div class="empty">No items yet. Add an item below.</div>';
+  arr.forEach((it,i)=>{
+   const row=document.createElement("div");row.className="row";
+   const left=document.createElement("div");left.innerHTML=`<div class="name">${esc(it.name)}</div><div class="stamp">${it.updated?"Updated: "+esc(it.updated):"Not updated yet"}</div>`;
+   if(cat==="Condiments"){const n=document.createElement("textarea");n.className="note";n.placeholder="Notes for this condiment…";n.value=it.note||"";n.disabled=!unlocked;n.onchange=()=>{snapshot();it.note=n.value;it.updated=now();changed();toast("Note saved")};left.appendChild(n)}
+   row.appendChild(left);
+   const c=document.createElement("div");c.className="controls";
+   const m=document.createElement("button");m.className="mini minus";m.textContent="−";m.disabled=!unlocked;m.onclick=()=>adjust(i,-1);
+   const q=document.createElement("div");q.className="qty";q.textContent=it.qty;
+   const p=document.createElement("button");p.className="mini plus";p.textContent="+";p.disabled=!unlocked;p.onclick=()=>adjust(i,1);
+   const d=document.createElement("button");d.className="mini trash";d.textContent="🗑";d.disabled=!unlocked;d.title="Delete item";d.onclick=()=>del(i);
+   c.append(m,q,p,d);row.appendChild(c);rows.appendChild(row);
+  });
+  sec.appendChild(rows);
+  const add=document.createElement("div");add.className="addline";
+  const inp=document.createElement("input");inp.placeholder=`Add item to ${cat}…`;inp.id=`add-${cat}`;
+  const b=document.createElement("button");b.className="btn yellow";b.textContent="＋ Add";b.disabled=!unlocked;b.onclick=()=>addItem(cat,inp);
+  add.append(inp,b);sec.appendChild(add);root.appendChild(sec);
+ }
+}
+function adjust(i,d){snapshot();let it=state.items[current][findCat(i)][i];it.qty=Math.max(0,it.qty+d);it.updated=now();changed();toast(d>0?"Quantity increased":"Quantity decreased")}
+function findCat(i){return Object.keys(state.items[current]).find(cat=>state.items[current][cat][i])}
+function addItem(cat,inp){let n=inp.value.trim();if(!n)return; snapshot();state.items[current][cat].push({name:n,qty:0,note:"",updated:now()});changed();toast("Item added")}
+function del(i){let cat=findCat(i),it=state.items[current][cat][i];if(!confirm(`Delete "${it.name}"?`))return;snapshot();state.items[current][cat].splice(i,1);changed();toast("Item deleted")}
+function resetAll(){if(!unlocked)return;if(!confirm("Reset all quantities in this inventory to 0?"))return;snapshot();for(const cat in state.items[current])for(const it of state.items[current][cat]){it.qty=0;it.updated=now()}changed();toast("Quantities reset")}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+function openModal(title,body,onConfirm){document.getElementById("modalTitle").textContent=title;document.getElementById("modalBody").innerHTML=body;document.getElementById("modal").classList.add("show");document.getElementById("confirmModal").onclick=()=>{onConfirm();document.getElementById("modal").classList.remove("show")}}
+document.getElementById("cancelModal").onclick=()=>document.getElementById("modal").classList.remove("show");
+
+function unlock(){
+ if(!state.password){
+  openModal("Create your inventory password",`<p class="small">This password protects quantity changes, adding/deleting items, notes, and reset functions.</p><input id="pw1" type="password" placeholder="Create password"><input id="pw2" type="password" placeholder="Confirm password">`,()=>{
+   const a=document.getElementById("pw1").value,b=document.getElementById("pw2").value;if(!a||a!==b){toast("Passwords do not match");return}state.password=a;save();unlocked=true;updateStatus();render();toast("Password created")});
+ }else{
+  openModal("Unlock inventory",`<p class="small">Enter your password to edit the inventory.</p><input id="pw" type="password" placeholder="Password">`,()=>{
+   if(document.getElementById("pw").value===state.password){unlocked=true;updateStatus();render();toast("Inventory unlocked")}else toast("Incorrect password")});
+ }
+}
+document.getElementById("lockBtn").onclick=()=>{if(unlocked){unlocked=false;save();updateStatus();render();toast("Inventory locked")}else unlock()};
+document.getElementById("addBtn").onclick=()=>{if(!unlocked){unlock();return}let cats=Object.keys(state.items[current]);openModal("Add item",`<input id="newName" placeholder="Item name"><select id="newCat" style="width:100%;padding:13px;border:1px solid #efdce0;border-radius:14px">${cats.map(c=>`<option>${esc(c)}</option>`).join("")}</select>`,()=>{let n=document.getElementById("newName").value.trim(),c=document.getElementById("newCat").value;if(!n)return;snapshot();state.items[current][c].push({name:n,qty:0,note:"",updated:now()});changed();toast("Item added")})};
+document.getElementById("resetBtn").onclick=()=>resetAll();
+document.getElementById("undoBtn").onclick=()=>{if(!unlocked){unlock();return}if(!undoStack.length){toast("Nothing to undo");return}state=undoStack.pop();save();render();updateStatus();toast("Undone")};
+document.getElementById("passBtn").onclick=()=>{if(!unlocked){unlock();return}openModal("Change password",`<input id="oldpw" type="password" placeholder="Current password"><input id="newpw" type="password" placeholder="New password">`,()=>{if(document.getElementById("oldpw").value!==state.password){toast("Incorrect password");return}let p=document.getElementById("newpw").value;if(!p){toast("Password cannot be empty");return}state.password=p;save();toast("Password changed")})};
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{current=b.dataset.inv;document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b));render()});
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+init();
+</script>
+</body></html>
